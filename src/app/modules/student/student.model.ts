@@ -10,7 +10,7 @@ const userNameSchema = new Schema<UserName>({
 const studentSchema = new Schema<Student>({
   id: { type: String },
   name: userNameSchema,
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   gender: ['male', 'female'],
   bloodGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
   contactNo: { type: String, required: true },
@@ -26,4 +26,4 @@ const studentSchema = new Schema<Student>({
   isActive: ['active', 'blocked'],
 });
 
-const Student = model<Student>('student', studentSchema);
+export const StudentModel = model<Student>('student', studentSchema);
