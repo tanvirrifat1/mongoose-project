@@ -1,12 +1,15 @@
-import app from "./server";
-const mongoose = require("mongoose");
+import express, { Application, Request, Response } from "express";
+import cors from "cors";
 
-const PORT = 5000;
+const app: Application = express();
 
-async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/test");
-}
+// parser
+app.use(express.json());
+app.use(express.text());
+app.use(cors());
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello World!");
 });
+
+export default app;

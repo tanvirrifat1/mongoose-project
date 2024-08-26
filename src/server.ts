@@ -1,9 +1,19 @@
-import express, { Request, Response } from "express";
-const app = express();
-const port = 3000;
+import app from "./app";
+import config from "./app/config";
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!");
-});
+import mongoose from "mongoose";
 
-export default app;
+const PORT = 5000;
+
+async function main() {
+  try {
+    await mongoose.connect(config.database_rul as string);
+    app.listen(PORT, () => {
+      console.log(`Example app listening on port ${config.port}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+main();
