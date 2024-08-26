@@ -1,13 +1,15 @@
-import { Schema } from 'mongoose';
-import { Student } from './student.interface';
+import { model, Schema } from 'mongoose';
+import { Student, UserName } from './student.interface';
+
+const userNameSchema = new Schema<UserName>({
+  firstName: { type: String, required: true },
+  middleName: { type: String },
+  lastName: { type: String, required: true },
+});
 
 const studentSchema = new Schema<Student>({
   id: { type: String },
-  name: {
-    firstName: { type: String, required: true },
-    middleName: { type: String },
-    lastName: { type: String, required: true },
-  },
+  name: userNameSchema,
   email: { type: String, required: true },
   gender: ['male', 'female'],
   bloodGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
@@ -15,11 +17,13 @@ const studentSchema = new Schema<Student>({
   dateOfBirth: String,
   emergencyContactNo: { type: String, required: true },
   guardian: {
-    fatherName: String,
-    motherName: String,
+    fatherName: { type: String, required: true },
+    motherName: { type: String, required: true },
   },
   presentAddress: { type: String, required: true },
   permanentAddress: { type: String, required: true },
   profileImage: String,
   isActive: ['active', 'blocked'],
 });
+
+const Student = model<Student>('student', studentSchema);
