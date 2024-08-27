@@ -7,19 +7,21 @@ const userNameSchema = new Schema<UserName>({
   lastName: { type: String, required: true },
 });
 
+const userGuardian = {
+  fatherName: { type: String, required: true },
+  motherName: { type: String, required: true },
+};
+
 const studentSchema = new Schema<Student>({
   id: { type: String },
   name: userNameSchema,
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true },
   gender: ['male', 'female'],
   bloodGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
   contactNo: { type: String, required: true },
   dateOfBirth: String,
   emergencyContactNo: { type: String, required: true },
-  guardian: {
-    fatherName: { type: String, required: true },
-    motherName: { type: String, required: true },
-  },
+  guardian: userGuardian,
   presentAddress: { type: String, required: true },
   permanentAddress: { type: String, required: true },
   profileImage: String,
