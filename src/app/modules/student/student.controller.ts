@@ -31,7 +31,6 @@ const getAllStudent = async (req: Request, res: Response) => {
 
 const getSingleStudent = async (req: Request, res: Response) => {
   try {
-    // console.log(req.params.id);
     const result = await StudentService.getSingleStudent(req.params.id);
     res.status(200).json({
       success: true,

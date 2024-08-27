@@ -22,5 +22,5 @@ export type Student = {
   permanentAddress: string;
   guardian: Guardian;
   profileImage?: string;
-  isActive: 'active' | 'blocked';
+  isActive?: 'active' | 'blocked';
 };
