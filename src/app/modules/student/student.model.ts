@@ -1,6 +1,5 @@
 import { model, Schema } from 'mongoose';
 import { Student, UserName } from './student.interface';
-import { isCapitalized } from '../../ulitis/Validator';
 
 const userNameSchema = new Schema<UserName>({
   firstName: {
@@ -8,13 +7,21 @@ const userNameSchema = new Schema<UserName>({
     trim: true,
     maxlength: [20, 'Max allowed length is 20'],
     required: [true, 'must be need to firstName'],
-    validate: {
-      validator: isCapitalized,
-      message: '{VALUE} is not capitalized format',
-    },
+    // validate: {
+    //   validator: isCapitalized,
+    //   message: '{VALUE} is not capitalized format',
+    // },
   },
-  middleName: { type: String, trim: true }, // Optional, trim if needed
-  lastName: { type: String, trim: true, required: true },
+  middleName: { type: String, trim: true },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true,
+    // validate: {
+    //   validator: (value: string) => validator.isAlpha(value),
+    //   message: '{VALUE} is not valid',
+    // },
+  },
 });
 
 const userGuardian = {
@@ -28,7 +35,16 @@ const studentSchema = new Schema<Student>({
     type: userNameSchema,
     required: true,
   },
-  email: { type: String, trim: true, required: true, unique: true },
+  email: {
+    type: String,
+    trim: true,
+    required: true,
+    unique: true,
+    // validate: {
+    //   validator: (value: string) => validator.isEmail(value),
+    //   message: '{VALUE} is not valid',
+    // },
+  },
   gender: {
     type: String,
     enum: {
