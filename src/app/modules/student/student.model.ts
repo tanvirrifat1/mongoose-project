@@ -1,10 +1,5 @@
 import { model, Schema } from 'mongoose';
-import {
-  TStudent,
-  StudentMethods,
-  StudentModel,
-  TUserName,
-} from './student.interface';
+import { TStudent, StudentModel, TUserName } from './student.interface';
 
 // const userNameSchema = new Schema<UserName>({
 //   firstName: {
@@ -95,8 +90,13 @@ const userGuardian = {
   motherName: { type: String, trim: true, required: true },
 };
 
-const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
-  id: { type: String, trim: true, required: true, unique: true },
+const studentSchema = new Schema<TStudent, StudentModel>({
+  id: {
+    type: String,
+    trim: true,
+    required: [true, 'Id is required!'],
+    unique: true,
+  },
   name: {
     type: userNameSchema,
     required: true,
@@ -135,10 +135,17 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
     default: 'active',
   },
 });
+//creating a custom static method
 
-studentSchema.methods.isUserExist = async function (id: string) {
-  const existUser = await Student.findOne({ id });
-  return existUser;
+studentSchema.statics.isUserExists = async function (id: string) {
+  const UserExist = await Student.findOne({ id });
+  return UserExist;
 };
+
+// creating a custom instance method
+// studentSchema.methods.isUserExist = async function (id: string) {
+//   const existUser = await Student.findOne({ id });
+//   return existUser;
+// };
 
 export const Student = model<TStudent, StudentModel>('student', studentSchema);
