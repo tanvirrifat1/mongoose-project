@@ -1,5 +1,10 @@
 import { model, Schema } from 'mongoose';
-import { Student, UserName } from './student.interface';
+import {
+  TStudent,
+  StudentMethods,
+  StudentModel,
+  TUserName,
+} from './student.interface';
 
 // const userNameSchema = new Schema<UserName>({
 //   firstName: {
@@ -71,7 +76,7 @@ import { Student, UserName } from './student.interface';
 //   },
 // });
 
-const userNameSchema = new Schema<UserName>({
+const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
     trim: true,
@@ -90,7 +95,7 @@ const userGuardian = {
   motherName: { type: String, trim: true, required: true },
 };
 
-const studentSchema = new Schema<Student>({
+const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
   id: { type: String, trim: true, required: true, unique: true },
   name: {
     type: userNameSchema,
@@ -131,4 +136,9 @@ const studentSchema = new Schema<Student>({
   },
 });
 
-export const StudentModel = model<Student>('student', studentSchema);
+studentSchema.methods.isUserExist = async function (id: string) {
+  const existUser = await Student.findOne({ id });
+  return existUser;
+};
+
+export const Student = model<TStudent, StudentModel>('student', studentSchema);
