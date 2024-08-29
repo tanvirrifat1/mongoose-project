@@ -92,64 +92,76 @@ const userGuardian = {
   motherName: { type: String, trim: true, required: true },
 };
 
-const studentSchema = new Schema<TStudent, StudentModel>({
-  id: {
-    type: String,
-    trim: true,
-    required: [true, 'Id is required!'],
-    unique: true,
-  },
-  password: {
-    type: String,
-    trim: true,
-    required: [true, 'password is required!'],
-    maxlength: [20, 'password cannot be more then 20 character'],
-  },
-  name: {
-    type: userNameSchema,
-    required: true,
-  },
-  email: {
-    type: String,
-    trim: true,
-    required: true,
-    unique: true,
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ['male', 'female', 'other'],
-      message: '{VALUE} is not valid',
+const studentSchema = new Schema<TStudent, StudentModel>(
+  {
+    id: {
+      type: String,
+      trim: true,
+      required: [true, 'Id is required!'],
+      unique: true,
     },
-    required: true,
-  },
-  bloodGroup: {
-    type: String,
-    enum: {
-      values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-      message: '{VALUE} is not valid',
+    password: {
+      type: String,
+      trim: true,
+      required: [true, 'password is required!'],
+      maxlength: [20, 'password cannot be more then 20 character'],
+    },
+    name: {
+      type: userNameSchema,
+      required: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+      required: true,
+      unique: true,
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ['male', 'female', 'other'],
+        message: '{VALUE} is not valid',
+      },
+      required: true,
+    },
+    bloodGroup: {
+      type: String,
+      enum: {
+        values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+        message: '{VALUE} is not valid',
+      },
+    },
+    contactNo: { type: String, trim: true, required: true },
+    dateOfBirth: { type: String, trim: true },
+    emergencyContactNo: { type: String, trim: true, required: true },
+    guardian: userGuardian,
+    presentAddress: { type: String, trim: true, required: true },
+    permanentAddress: { type: String, trim: true, required: true },
+    profileImage: { type: String, trim: true },
+    isActive: {
+      type: String,
+      enum: ['active', 'blocked'],
+      default: 'active',
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
-  contactNo: { type: String, trim: true, required: true },
-  dateOfBirth: { type: String, trim: true },
-  emergencyContactNo: { type: String, trim: true, required: true },
-  guardian: userGuardian,
-  presentAddress: { type: String, trim: true, required: true },
-  permanentAddress: { type: String, trim: true, required: true },
-  profileImage: { type: String, trim: true },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
+  {
+    toJSON: {
+      virtuals: true,
+    },
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
+);
+
+// virtual
+
+studentSchema.virtual('fullNafffme').get(function () {
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 
 // pre save middleware
-
 studentSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const bcUser = this;

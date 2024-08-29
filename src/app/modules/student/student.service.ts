@@ -35,7 +35,15 @@ const getSingleStudent = async (id: string) => {
 };
 
 const deleteStudentFromDb = async (id: string) => {
-  const result = await Student.updateOne({ id }, { isDeleted: true });
+  const result = await Student.updateOne({ _id: id }, { isDeleted: true });
+  return result;
+};
+
+const updateStudent = async (id: string, payload: Partial<TStudent>) => {
+  const result = await Student.findOneAndUpdate({ id }, payload, {
+    new: true,
+    runValidators: true,
+  });
   return result;
 };
 
@@ -44,4 +52,5 @@ export const StudentService = {
   getAllStudent,
   getSingleStudent,
   deleteStudentFromDb,
+  updateStudent,
 };
