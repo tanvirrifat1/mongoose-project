@@ -41,6 +41,7 @@ const studentZodSchema = z.object({
     })
 
     .nonempty('ID cannot be empty'),
+  password: z.string().max(20),
   name: userNameSchema,
   email: z
     .string({

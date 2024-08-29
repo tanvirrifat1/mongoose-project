@@ -1,5 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { TStudent, StudentModel, TUserName } from './student.interface';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
 // const userNameSchema = new Schema<UserName>({
 //   firstName: {
@@ -97,6 +99,13 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     required: [true, 'Id is required!'],
     unique: true,
   },
+  password: {
+    type: String,
+    trim: true,
+    required: [true, 'password is required!'],
+    unique: true,
+    maxlength: [20, 'password cannot be more then 20 character'],
+  },
   name: {
     type: userNameSchema,
     required: true,
@@ -135,6 +144,23 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     default: 'active',
   },
 });
+
+// pre save middleware
+
+studentSchema.pre('save', async function () {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const bcUser = this;
+  bcUser.password = await bcrypt.hash(
+    bcUser.password,
+    Number(config.bcrypt_Salt_rounds),
+  );
+});
+
+// pre save middleware
+studentSchema.post('save', function () {
+  console.log(this, 'post hok: middleware');
+});
+
 //creating a custom static method
 
 studentSchema.statics.isUserExists = async function (id: string) {
