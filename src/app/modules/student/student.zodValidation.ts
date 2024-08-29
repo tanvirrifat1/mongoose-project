@@ -92,6 +92,7 @@ const studentZodSchema = z.object({
       errorMap: () => ({ message: "Status must be 'active' or 'blocked'" }),
     })
     .default('active'),
+  isDeleted: z.boolean().optional(),
 });
 // Export the schema
 export default studentZodSchema;
