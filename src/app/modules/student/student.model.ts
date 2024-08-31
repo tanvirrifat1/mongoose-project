@@ -1,7 +1,5 @@
 import { model, Schema } from 'mongoose';
 import { TStudent, StudentModel, TUserName } from './student.interface';
-import bcrypt from 'bcrypt';
-import config from '../../config';
 
 // const userNameSchema = new Schema<UserName>({
 //   firstName: {
@@ -100,12 +98,12 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: [true, 'Id is required!'],
       unique: true,
     },
-    password: {
-      type: String,
-      trim: true,
-      required: [true, 'password is required!'],
-      maxlength: [20, 'password cannot be more then 20 character'],
-    },
+    // password: {
+    //   type: String,
+    //   trim: true,
+    //   required: [true, 'password is required!'],
+    //   maxlength: [20, 'password cannot be more then 20 character'],
+    // },
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'user id must be required'],
@@ -153,31 +151,32 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     toJSON: {
       virtuals: true,
     },
+    timestamps: true,
   },
 );
 
 // virtual
 
-studentSchema.virtual('fullNafffme').get(function () {
+studentSchema.virtual('fullName').get(function () {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 
 // pre save middleware
-studentSchema.pre('save', async function (next) {
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const bcUser = this;
-  bcUser.password = await bcrypt.hash(
-    bcUser.password,
-    Number(config.bcrypt_Salt_rounds),
-  );
-  next();
-});
+// studentSchema.pre('save', async function (next) {
+//   // eslint-disable-next-line @typescript-eslint/no-this-alias
+//   const bcUser = this;
+//   bcUser.password = await bcrypt.hash(
+//     bcUser.password,
+//     Number(config.bcrypt_Salt_rounds),
+//   );
+//   next();
+// });
 
-// pre save middleware
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
-});
+// // pre save middleware
+// studentSchema.post('save', function (doc, next) {
+//   doc.password = '';
+//   next();
+// });
 
 // query middleware
 
