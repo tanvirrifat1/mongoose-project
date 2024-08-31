@@ -31,29 +31,6 @@ import studentZodSchema from './student.zodValidation';
 //   }
 // };
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student: StudentData } = req.body;
-
-    const zodSchema = studentZodSchema.parse(StudentData);
-
-    const result = await StudentService.createStudentIntoDb(zodSchema);
-
-    res.status(200).json({
-      success: true,
-      message: 'Student created successfully!',
-      data: result,
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message || 'something went wrong!',
-      error: error,
-    });
-  }
-};
-
 const getAllStudent = async (req: Request, res: Response) => {
   try {
     const result = await StudentService.getAllStudent();
@@ -127,7 +104,6 @@ const updateStudent = async (req: Request, res: Response) => {
   }
 };
 export const StudentController = {
-  createStudent,
   getAllStudent,
   getSingleStudent,
   deleteStudentFromDb,
