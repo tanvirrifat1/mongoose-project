@@ -34,7 +34,7 @@ const userGuardianSchema = z.object({
 });
 
 // Zod schema for studentSchema
-const studentZodSchema = z.object({
+const createStudentValidationSchema = z.object({
   body: z.object({
     password: z.string().max(20),
     student: z.object({
@@ -88,5 +88,5 @@ const studentZodSchema = z.object({
 });
 // Export the schema
 export const studentValidations = {
-  studentZodSchema,
+  createStudentValidationSchema,
 };
