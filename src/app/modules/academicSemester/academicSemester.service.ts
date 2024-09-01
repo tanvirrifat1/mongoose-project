@@ -45,9 +45,15 @@ const updateSemester = async (id: string, data: Partial<TAcademicSemester>) => {
   return result;
 };
 
+const deleteSemesterFromDb = async (id: string) => {
+  const result = await AcademicSemester.deleteOne({ _id: id });
+  return result;
+};
+
 export const AcademicSemesterService = {
   createSemesterFromGb,
   getAllSemesterFromDb,
   getSingleSemesterFromDb,
   updateSemester,
+  deleteSemesterFromDb,
 };
