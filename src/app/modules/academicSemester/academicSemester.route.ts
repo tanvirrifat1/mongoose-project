@@ -13,4 +13,8 @@ router.post(
   AcademicSemesterController.createSemesterFromGb,
 );
 
+router.get('/', AcademicSemesterController.getAllSemesterFromDb);
+router.get('/:id', AcademicSemesterController.getSingleSemesterFromDb);
+router.patch('/:id', AcademicSemesterController.updateSemester);
+
 export const AcademicSemesterRoute = router;

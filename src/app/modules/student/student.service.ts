@@ -31,9 +31,8 @@ const deleteStudentFromDb = async (id: string) => {
 };
 
 const updateStudent = async (id: string, payload: Partial<TStudent>) => {
-  const result = await Student.findOneAndUpdate({ id }, payload, {
+  const result = await Student.findOneAndUpdate({ _id: id }, payload, {
     new: true,
-    runValidators: true,
   });
   return result;
 };
