@@ -83,6 +83,7 @@ const createStudentValidationSchema = z.object({
 
         .nonempty('Permanent address cannot be empty'),
       profileImage: z.string().optional(),
+      admissionSemester: z.string(),
     }),
   }),
 });
