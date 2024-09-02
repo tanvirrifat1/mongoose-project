@@ -19,3 +19,6 @@ const GlobalErrorHandler = (
 };
 
 export default GlobalErrorHandler;
+export type TAcademicFaculty = {
+  name: string;
+};
