@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import httpStatus from 'http-status';
 import { AppError } from '../../../utils/AppError';
 import config from '../../config';
@@ -53,6 +52,7 @@ const createStudentIntoDb = async (password: string, studentData: TStudent) => {
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
+    console.log(error);
   }
 };
 

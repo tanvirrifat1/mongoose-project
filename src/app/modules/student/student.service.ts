@@ -1,5 +1,9 @@
+import mongoose from 'mongoose';
 import { TStudent } from './student.interface';
 import { Student } from './student.model';
+import { AppError } from '../../../utils/AppError';
+import httpStatus from 'http-status';
+import { User } from '../user/user.model';
 
 // build in static method
 
@@ -39,11 +43,6 @@ const getSingleStudent = async (id: string) => {
   return result;
 };
 
-const deleteStudentFromDb = async (id: string) => {
-  const result = await Student.updateOne({ _id: id }, { isDeleted: true });
-  return result;
-};
-
 const updateStudent = async (id: string, payload: Partial<TStudent>) => {
   const result = await Student.findOneAndUpdate({ _id: id }, payload, {
     new: true,
@@ -51,6 +50,42 @@ const updateStudent = async (id: string, payload: Partial<TStudent>) => {
   return result;
 };
 
+const deleteStudentFromDb = async (id: string) => {
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const deletedStudent = await Student.findOneAndUpdate(
+      { id },
+      { isDeleted: true },
+      { new: true, session },
+    );
+
+    if (!deletedStudent) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete student');
+    }
+
+    const deleteUser = await User.findOneAndUpdate(
+      {
+        id,
+      },
+      { isDeleted: true },
+      { new: true, session },
+    );
+
+    if (!deleteUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return deletedStudent;
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    console.log(error);
+  }
+};
 export const StudentService = {
   getAllStudent,
   getSingleStudent,

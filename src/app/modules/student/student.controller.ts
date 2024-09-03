@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { StudentService } from './student.service';
+import httpStatus from 'http-status';
 
 // const createStudent = async (req: Request, res: Response) => {
 //   try {
@@ -71,7 +72,7 @@ const deleteStudentFromDb = async (
   try {
     const { id } = req.params;
     const result = await StudentService.deleteStudentFromDb(id);
-    res.status(200).json({
+    res.status(httpStatus.BAD_REQUEST).json({
       success: true,
       message: 'Delete single student successfully!',
       data: result,

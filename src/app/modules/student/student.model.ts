@@ -1,5 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { TStudent, StudentModel, TUserName } from './student.interface';
+import { AppError } from '../../../utils/AppError';
+import httpStatus from 'http-status';
 
 // const userNameSchema = new Schema<UserName>({
 //   firstName: {
@@ -209,6 +211,17 @@ studentSchema.statics.isUserExists = async function (id: string) {
   const UserExist = await Student.findOne({ id });
   return UserExist;
 };
+
+studentSchema.pre('findOneAndUpdate', async function (next) {
+  const query = this.getQuery();
+
+  const IsExist = await Student.findOne(query);
+
+  if (!IsExist) {
+    throw new AppError(httpStatus.BAD_GATEWAY, 'Student does not exist');
+  }
+  next();
+});
 
 // creating a custom instance method
 // studentSchema.methods.isUserExist = async function (id: string) {
