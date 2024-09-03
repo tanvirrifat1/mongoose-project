@@ -32,7 +32,7 @@ const getAllStudent = async () => {
 };
 
 const getSingleStudent = async (id: string) => {
-  const result = await Student.findById({ _id: id })
+  const result = await Student.findOne({ id })
     .populate('admissionSemester')
     .populate({
       path: 'academicDepartment',
@@ -44,8 +44,27 @@ const getSingleStudent = async (id: string) => {
 };
 
 const updateStudent = async (id: string, payload: Partial<TStudent>) => {
-  const result = await Student.findOneAndUpdate({ _id: id }, payload, {
+  const { name, guardian, ...remainingStudentData } = payload;
+
+  const modifiedUpdateData: Record<string, unknown> = {
+    ...remainingStudentData,
+  };
+
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdateData[`name.${key}`] = value;
+    }
+  }
+
+  if (guardian && Object.keys(guardian).length) {
+    for (const [key, value] of Object.entries(guardian)) {
+      modifiedUpdateData[`guardian.${key}`] = value;
+    }
+  }
+  console.log(modifiedUpdateData);
+  const result = await Student.findOneAndUpdate({ id }, modifiedUpdateData, {
     new: true,
+    runValidators: true,
   });
   return result;
 };
@@ -83,7 +102,7 @@ const deleteStudentFromDb = async (id: string) => {
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
-    console.log(error);
+    throw new AppError(httpStatus.BAD_REQUEST, `${error}`);
   }
 };
 export const StudentService = {

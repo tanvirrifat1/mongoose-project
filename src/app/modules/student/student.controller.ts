@@ -89,11 +89,11 @@ const updateStudent = async (
 ) => {
   try {
     const { id } = req.params;
-    const updatedData = req.body;
-    const result = await StudentService.updateStudent(id, updatedData);
+    const { student } = req.body;
+    const result = await StudentService.updateStudent(id, student);
     res.status(200).json({
       success: true,
-      message: 'Data Updated successfully!',
+      message: 'student Updated successfully!',
       data: result,
     });
   } catch (error) {

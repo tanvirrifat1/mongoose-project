@@ -52,7 +52,7 @@ const createStudentIntoDb = async (password: string, studentData: TStudent) => {
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
-    console.log(error);
+    throw new AppError(httpStatus.BAD_REQUEST, `${error}`);
   }
 };
 
