@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import httpStatus from 'http-status';
+import { AppError } from '../../../utils/AppError';
 import config from '../../config';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { TStudent } from '../student/student.interface';
@@ -5,6 +8,7 @@ import { Student } from '../student/student.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
 import { generateStudentId } from './user.utils';
+import mongoose from 'mongoose';
 
 const createStudentIntoDb = async (password: string, studentData: TStudent) => {
   const userData: Partial<TUser> = {};
@@ -20,20 +24,35 @@ const createStudentIntoDb = async (password: string, studentData: TStudent) => {
   );
 
   if (!AdmissionSemester) {
-    throw new Error('Admission semester not found');
+    throw new AppError(httpStatus.NOT_FOUND, 'Admission semester not found');
   }
 
-  userData.id = await generateStudentId(AdmissionSemester);
+  const session = await mongoose.startSession();
 
-  const newUser = await User.create(userData);
+  try {
+    session.startTransaction();
+    userData.id = await generateStudentId(AdmissionSemester);
 
-  if (Object.keys(newUser).length) {
-    studentData.id = newUser.id;
-    studentData.user = newUser._id;
+    const newUser = await User.create([userData], { session });
 
-    const newStudent = await Student.create(studentData);
+    if (!newUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
+    }
 
+    studentData.id = newUser[0].id;
+    studentData.user = newUser[0]._id;
+
+    const newStudent = await Student.create([studentData], { session });
+
+    if (!newStudent.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create student');
+    }
+    await session.commitTransaction();
+    await session.endSession();
     return newStudent;
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
   }
 };
 

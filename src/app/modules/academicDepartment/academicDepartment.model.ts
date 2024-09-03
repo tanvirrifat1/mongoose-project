@@ -22,7 +22,7 @@ academicDepartmentSchema.pre('save', async function (next) {
   });
 
   if (isDepartmentExist) {
-    throw new Error('Already exist this department');
+    throw new AppError(httpStatus.NOT_FOUND, 'Already exist this department');
   }
   next();
 });
