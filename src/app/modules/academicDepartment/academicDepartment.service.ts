@@ -14,12 +14,13 @@ const createAcademicDepartmentIntoDb = async (payload: TAcademicDepartment) => {
 };
 
 const getAllDepartment = async () => {
-  const result = await AcademicDepartment.find();
+  const result = await AcademicDepartment.find().populate('academicFaculty');
   return result;
 };
 
 const getSingleDepartment = async (id: string) => {
-  const result = await AcademicDepartment.findById(id);
+  const result =
+    await AcademicDepartment.findById(id).populate('academicFaculty');
 
   return result;
 };
