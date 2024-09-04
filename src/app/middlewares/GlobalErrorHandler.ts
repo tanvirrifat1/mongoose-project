@@ -4,6 +4,8 @@ import httpStatus from 'http-status';
 import { ZodError } from 'zod';
 import { TErrorSource } from '../interface/errInterface';
 import config from '../config';
+import handleZodError from '../error/handleZodError';
+import handleValidationError from '../error/HandleValidationError';
 
 const GlobalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
   let statusCode = error.statusCode || 500;
@@ -16,25 +18,13 @@ const GlobalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     },
   ];
 
-  const handleZodError = (error: ZodError) => {
-    statusCode = 400;
-
-    const errorSources: TErrorSource = error.issues.map((issue) => {
-      return {
-        path: issue?.path[issue.path.length - 1],
-        message: issue?.message,
-      };
-    });
-
-    return {
-      statusCode,
-      message: 'Validation Error',
-      errorSources,
-    };
-  };
-
   if (error instanceof ZodError) {
     const simplifiedError = handleZodError(error);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  } else if (error?.name === 'handleValidationError') {
+    const simplifiedError = handleValidationError(error);
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
