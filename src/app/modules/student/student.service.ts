@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import { TStudent } from './student.interface';
 import { Student } from './student.model';
@@ -5,22 +6,18 @@ import { AppError } from '../../../utils/AppError';
 import httpStatus from 'http-status';
 import { User } from '../user/user.model';
 
-// build in static method
+const getAllStudent = async (query: any) => {
+  let searchTerm = '';
 
-// build in instance method
-// const createStudentIntoDb = async (studentData: TStudent) => {
-//   const student = new Student(studentData);
+  if (query?.searchTerm) {
+    searchTerm = query?.searchTerm as string;
+  }
 
-//   if (await student.isUserExist(studentData.id)) {
-//     throw new Error('User Already Exist');
-//   }
-
-//   const result = await student.save();
-//   return result;
-// };
-
-const getAllStudent = async () => {
-  const result = await Student.find()
+  const result = await Student.find({
+    $or: ['email', 'name.firstName', 'presentAddress'].map((field) => ({
+      [field]: { $regex: searchTerm, $options: 'i' },
+    })),
+  })
     .populate('admissionSemester')
     .populate({
       path: 'academicDepartment',

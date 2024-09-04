@@ -2,40 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import { StudentService } from './student.service';
 import httpStatus from 'http-status';
 
-// const createStudent = async (req: Request, res: Response) => {
-//   try {
-//     const { student: StudentData } = req.body;
-//     const { error, value } = studentSchema.validate(StudentData);
-//     const result = await StudentService.createStudentIntoDb(value);
-//     if (error) {
-//       res.status(500).json({
-//         success: false,
-//         message: 'something went wrong!',
-//         error: error.details,
-//       });
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       message: 'Student created successfully!',
-//       data: result,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: 'something went wrong!',
-//       error: error,
-//     });
-//   }
-// };
-
 const getAllStudent = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const result = await StudentService.getAllStudent();
+    const result = await StudentService.getAllStudent(req.query);
 
     res.status(200).json({
       success: true,
