@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import { ErrorRequestHandler } from 'express';
 import httpStatus from 'http-status';
 import { ZodError } from 'zod';
 import { TErrorSource } from '../interface/errInterface';
 import config from '../config';
 import handleZodError from '../error/handleZodError';
 import handleValidationError from '../error/HandleValidationError';
+import handleCastError from '../error/HandleCasError';
+import handleDuplicateError from '../error/handleDuplicateError';
+import { AppError } from '../../utils/AppError';
 
 const GlobalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
-  let statusCode = error.statusCode || 500;
-  let message = error.message || 'Something went wrong!';
+  let statusCode = 500;
+  let message = 'Something went wrong!';
 
   let errorSources: TErrorSource = [
     {
@@ -28,13 +31,40 @@ const GlobalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     statusCode = simplifiedError?.statusCode;
     message = simplifiedError?.message;
     errorSources = simplifiedError?.errorSources;
+  } else if (error?.name === 'CastError') {
+    const simplifiedError = handleCastError(error);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  } else if (error?.code === 11000) {
+    const simplifiedError = handleDuplicateError(error);
+    statusCode = simplifiedError?.statusCode;
+    message = simplifiedError?.message;
+    errorSources = simplifiedError?.errorSources;
+  } else if (error instanceof AppError) {
+    statusCode = error?.statusCode;
+    message = error?.message;
+    errorSources = [
+      {
+        path: '',
+        message: error?.message,
+      },
+    ];
+  } else if (error instanceof Error) {
+    message = error?.message;
+    errorSources = [
+      {
+        path: '',
+        message: error?.message,
+      },
+    ];
   }
 
   return res.status(statusCode).json({
     success: false,
     message,
     errorSources,
-    error: error,
+    error,
     stack: config.node_env === 'development' ? error?.stack : null,
   });
 };
