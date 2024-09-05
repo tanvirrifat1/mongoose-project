@@ -23,7 +23,7 @@ const getAllStudent = async (query: any) => {
     })),
   });
 
-  const excludesFields = ['searchTerm', 'sort', 'limit'];
+  const excludesFields = ['searchTerm', 'sort', 'limit', 'page', 'fields'];
 
   excludesFields.forEach((el) => delete queryObj[el]);
 
@@ -46,15 +46,32 @@ const getAllStudent = async (query: any) => {
 
   const sortQuery = filterQuery.sort(sort);
 
+  let page = 1;
   let limit = 1;
+  let skip = 0;
 
   if (query.limit) {
     limit = query.limit;
   }
 
-  const limitQuery = await sortQuery.limit(limit);
+  if (query.page) {
+    page = query.page;
+    skip = (page - 1) * limit;
+  }
 
-  return limitQuery;
+  const paginateQuery = sortQuery.skip(skip);
+
+  const limitQuery = paginateQuery.limit(limit);
+
+  let fields = '-__v';
+
+  if (query.fields) {
+    fields = (query.fields as string).split(',').join(' ');
+  }
+
+  const fieldQuery = await limitQuery.select(fields);
+
+  return fieldQuery;
 };
 
 const getSingleStudent = async (id: string) => {
