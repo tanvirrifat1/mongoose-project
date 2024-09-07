@@ -32,7 +32,21 @@ const getSingleFaculty = async (
   }
 };
 
+const updateFaculty = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { faculty } = req.body;
+  const result = await FacultyService.updateFaculty(id, faculty);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'faculty updated successfully!',
+    data: result,
+  });
+});
+
 export const FacultyController = {
   getAllFaculty,
   getSingleFaculty,
+  updateFaculty,
 };
