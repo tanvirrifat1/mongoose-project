@@ -1,5 +1,9 @@
+import mongoose from 'mongoose';
 import { TFaculty } from './faculty.interface';
 import { Faculty } from './faculty.model';
+import { AppError } from '../../../utils/AppError';
+import httpStatus from 'http-status';
+import { User } from '../user/user.model';
 
 const getAllFaculty = async () => {
   const result = await Faculty.find().populate('academicDepartment');
@@ -33,8 +37,48 @@ const updateFaculty = async (id: string, payload: Partial<TFaculty>) => {
   return result;
 };
 
+const deleteFaculty = async (id: string) => {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+
+    const deletedFaculty = await Faculty.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true, session },
+    );
+
+    if (!deletedFaculty) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete faculty');
+    }
+    console.log(deletedFaculty);
+    const userID = deletedFaculty.user;
+
+    const deleteUser = await User.findByIdAndUpdate(
+      userID,
+      { isDeleted: true },
+      { new: true, session },
+    );
+
+    if (!deleteUser) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to delete user');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return deletedFaculty;
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(httpStatus.BAD_REQUEST, `${error}`);
+  }
+};
+
 export const FacultyService = {
   getAllFaculty,
   getSingleFaculty,
   updateFaculty,
+  deleteFaculty,
 };
