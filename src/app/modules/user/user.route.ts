@@ -19,4 +19,6 @@ router.post(
   UserController.createFacultyIntoDb,
 );
 
+router.post('/create-admin', UserController.createAdminIntoDb);
+
 export const UserRoute = router;
