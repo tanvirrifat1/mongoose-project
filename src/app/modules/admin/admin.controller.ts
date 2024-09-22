@@ -28,7 +28,22 @@ const getSingleAdmin = catchAsync(async (req, res) => {
   });
 });
 
+const updatedAdmins = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { admin } = req.body;
+
+  const result = await AdminServices.updatedAdmins(id, admin);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'updated single admin',
+    data: result,
+  });
+});
+
 export const AdminController = {
   getAllAdmin,
   getSingleAdmin,
+  updatedAdmins,
 };
