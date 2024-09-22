@@ -42,8 +42,22 @@ const updatedAdmins = catchAsync(async (req, res) => {
   });
 });
 
+const deleteAdmins = catchAsync(async (req, res) => {
+  const { id } = req.params;
+
+  const result = await AdminServices.deleteAdmins(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'deleted admin successfully',
+    data: result,
+  });
+});
+
 export const AdminController = {
   getAllAdmin,
   getSingleAdmin,
   updatedAdmins,
+  deleteAdmins,
 };
