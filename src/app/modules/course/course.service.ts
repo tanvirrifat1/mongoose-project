@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { TCourse } from './course.interface';
-import { Course } from './course.model';
+import { TCourse, TCourseFaculty } from './course.interface';
+import { Course, CourseFaculty } from './course.model';
 import { AppError } from '../../../utils/AppError';
 import httpStatus from 'http-status';
 
@@ -117,10 +117,23 @@ const updatedCourse = async (id: string, payload: Partial<TCourse>) => {
   }
 };
 
+const assignFaculty = async (id: string, payload: Partial<TCourseFaculty>) => {
+  const result = await CourseFaculty.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: { faculties: { $each: payload } },
+    },
+    { upsert: true, new: true },
+  );
+
+  return result;
+};
+
 export const CourseService = {
   createCourse,
   getSingleCourse,
   getAllCourse,
   deleteCourse,
   updatedCourse,
+  assignFaculty,
 };
