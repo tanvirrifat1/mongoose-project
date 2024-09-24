@@ -22,6 +22,7 @@ const deleteCourse = async (id: string) => {
     { isDeleted: true },
     { new: true },
   );
+  console.log(result);
   return result;
 };
 
