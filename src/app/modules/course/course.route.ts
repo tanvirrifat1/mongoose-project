@@ -20,4 +20,9 @@ router.put(
   CourseController.assignFacultiesWithCourse,
 );
 
+router.delete(
+  '/:courseId/assign-remove',
+  CourseController.removeFacultiesFromCourseFromDB,
+);
+
 export const CourseRoute = router;
