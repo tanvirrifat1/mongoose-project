@@ -7,7 +7,7 @@ const createCourse = async (payload: TCourse) => {
 };
 
 const getAllCourse = async () => {
-  const result = await Course.find();
+  const result = await Course.find().populate('preRequisiteCourses.course');
   return result;
 };
 
@@ -22,7 +22,7 @@ const deleteCourse = async (id: string) => {
     { isDeleted: true },
     { new: true },
   );
-  console.log(result);
+
   return result;
 };
 
