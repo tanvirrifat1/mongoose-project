@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
 import { SemesterRegistrationService } from './semesterRegistration.service';
+import catchAsync from '../../../utils/catchAsync';
+import sendResponse from '../../../utils/sendResponse';
 
 const semesterRegistrationIntoDb = async (
   req: Request,
@@ -22,6 +24,49 @@ const semesterRegistrationIntoDb = async (
   }
 };
 
+const getAllSemesterRegistrationFromDb = catchAsync(async (req, res) => {
+  const result =
+    await SemesterRegistrationService.getAllSemesterRegistrationFromDb();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'SemesterRegistration fetched successfully',
+    data: result,
+  });
+});
+
+const getSingleSemesterRegistrationFromDb = catchAsync(async (req, res) => {
+  const result =
+    await SemesterRegistrationService.getSingleSemesterRegistrationFromDb(
+      req.params.id,
+    );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Single SemesterRegistration fetched successfully',
+    data: result,
+  });
+});
+
+const updateSemesterRegistration = catchAsync(async (req, res) => {
+  const result = await SemesterRegistrationService.updateSemesterRegistration(
+    req.params.id,
+    req.body,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'SemesterRegistration updated successfully',
+    data: result,
+  });
+});
+
 export const SemesterRegistrationController = {
   semesterRegistrationIntoDb,
+  getAllSemesterRegistrationFromDb,
+  getSingleSemesterRegistrationFromDb,
+  updateSemesterRegistration,
 };

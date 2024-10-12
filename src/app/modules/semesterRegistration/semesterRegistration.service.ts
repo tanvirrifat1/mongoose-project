@@ -15,9 +15,21 @@ const semesterRegistrationIntoDb = async (payload: TSemesterRegistration) => {
     throw new AppError(httpStatus.CONFLICT, 'This semester is already exist!');
   }
 
+  const isThereAnyUpcomingOrOnGogingSemester =
+    await SemesterRegistration.findOne({
+      $or: [{ status: 'UPCOMING' }, { status: 'ONGOING' }],
+    });
+
+  if (isThereAnyUpcomingOrOnGogingSemester) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `There is an ${isThereAnyUpcomingOrOnGogingSemester} adready exist!`,
+    );
+  }
+
   const isAcademicSemesterExist =
     await AcademicSemester.findById(academicSemesterId);
-  console.log('eee');
+
   if (!isAcademicSemesterExist) {
     throw new AppError(
       httpStatus.NOT_FOUND,
@@ -30,6 +42,47 @@ const semesterRegistrationIntoDb = async (payload: TSemesterRegistration) => {
   return result;
 };
 
+const getAllSemesterRegistrationFromDb = async () => {
+  const result = await SemesterRegistration.find().populate('academicSemester');
+
+  return result;
+};
+
+const getSingleSemesterRegistrationFromDb = async (id: string) => {
+  const result =
+    await SemesterRegistration.findById(id).populate('academicSemester');
+
+  return result;
+};
+
+const updateSemesterRegistration = async (
+  id: string,
+  payload: Partial<TSemesterRegistration>,
+) => {
+  const isSemesterRegistrationExist = await SemesterRegistration.findById(id);
+
+  if (!isSemesterRegistrationExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Semester registration not found');
+  }
+
+  const reqSemester = await SemesterRegistration.findById(id);
+
+  if (reqSemester?.status === 'ENDED') {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      `This semester is already ${reqSemester?.status}`,
+    );
+  }
+
+  const result = await SemesterRegistration.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
+  return result;
+};
+
 export const SemesterRegistrationService = {
   semesterRegistrationIntoDb,
+  getAllSemesterRegistrationFromDb,
+  getSingleSemesterRegistrationFromDb,
+  updateSemesterRegistration,
 };
