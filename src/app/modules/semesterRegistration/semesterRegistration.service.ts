@@ -60,22 +60,32 @@ const updateSemesterRegistration = async (
   payload: Partial<TSemesterRegistration>,
 ) => {
   const isSemesterRegistrationExist = await SemesterRegistration.findById(id);
-
+  const reqestStatus = payload.status;
   if (!isSemesterRegistrationExist) {
     throw new AppError(httpStatus.NOT_FOUND, 'Semester registration not found');
   }
 
   const reqSemester = await SemesterRegistration.findById(id);
 
-  if (reqSemester?.status === 'ENDED') {
+  const currentSemester = isSemesterRegistrationExist.status;
+
+  if (currentSemester === 'ENDED') {
     throw new AppError(
       httpStatus.NOT_FOUND,
       `This semester is already ${reqSemester?.status}`,
     );
   }
 
+  if (currentSemester === 'UPCOMING' && reqestStatus === 'ENDED') {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      `You cannot directly change from ${currentSemester} to ${reqestStatus}`,
+    );
+  }
+
   const result = await SemesterRegistration.findByIdAndUpdate(id, payload, {
     new: true,
+    runValidators: true,
   });
   return result;
 };
